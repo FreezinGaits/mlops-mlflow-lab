@@ -6,11 +6,8 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score, confusion_matrix
 import matplotlib.pyplot as plt
 import seaborn as sns
-import dagshub
 
-dagshub.init(repo_owner='freezinggaits917', repo_name='mlops-mlflow-lab', mlflow=True)
-
-mlflow.set_tracking_uri("https://dagshub.com/freezinggaits917/mlops-mlflow-lab.mlflow")
+mlflow.set_tracking_uri("http://127.0.0.1:5000")
 
 # Load Wine dataset
 wine = load_wine()
@@ -21,11 +18,12 @@ y = wine.target
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.10, random_state=42)
 
 # Define the params for RF model
-max_depth = 8
+max_depth = 10
 n_estimators = 5
 
 # Mention your experiment below
-mlflow.set_experiment('MLOPS-Exp-Remote')
+mlflow.autolog()                # New line to add to use Autolog
+mlflow.set_experiment('MLOPS-Exp-Remote-Autolog')
 
 with mlflow.start_run():
     rf = RandomForestClassifier(max_depth=max_depth, n_estimators=n_estimators, random_state=42)
@@ -34,9 +32,7 @@ with mlflow.start_run():
     y_pred = rf.predict(X_test)
     accuracy = accuracy_score(y_test, y_pred)
 
-    mlflow.log_metric('accuracy', accuracy)
-    mlflow.log_param('max_depth', max_depth)
-    mlflow.log_param('n_estimators', n_estimators)
+    # Note: No need to log params and metrics explicitly when using autolog
 
     # Creating a confusion matrix plot
     cm = confusion_matrix(y_test, y_pred)
@@ -50,13 +46,12 @@ with mlflow.start_run():
     plt.savefig("Confusion-matrix.png")
 
     # log artifacts using mlflow
-    mlflow.log_artifact("Confusion-matrix.png")
-    mlflow.log_artifact(__file__)
+    # No need to log artifacts explicitly when using autolog
+    mlflow.log_artifact(__file__) # Autolog does not log the current script file, so we log it manually
 
     # tags
-    mlflow.set_tags({"Author": 'Gautam', "Project": "Wine Classification"})
+    mlflow.set_tags({"Author": 'Gautam', "Project": "Wine Classification"}) # Autolog does not log tags, so we set them manually
 
-    # Log the model
-    mlflow.sklearn.log_model(rf, "Random-Forest-Model")
+    # No need to log the model explicitly when using autolog
 
     print(accuracy)
