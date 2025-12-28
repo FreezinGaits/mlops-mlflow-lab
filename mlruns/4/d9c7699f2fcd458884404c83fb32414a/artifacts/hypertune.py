@@ -8,7 +8,7 @@ import mlflow
 # Load the Breast Cancer dataset
 data = load_breast_cancer()
 X = pd.DataFrame(data.data, columns=data.feature_names)
-y = pd.Series(data.target, name='target').astype(float)
+y = pd.Series(data.target, name='target')
 
 # Splitting into training and testing sets
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
@@ -77,7 +77,7 @@ with mlflow.start_run() as parent:
     mlflow.log_artifact(__file__)
 
     # Log the best model
-    mlflow.sklearn.log_model(grid_search.best_estimator_, name="random_forest")
+    mlflow.sklearn.log_model(grid_search.best_estimator_, "random_forest")
 
     # Set tags
     mlflow.set_tag("author", "Gautam Sharma")
